@@ -1,10 +1,11 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 def plot(amplitudes):
     time_points = list(range(1, len(amplitudes) + 1))
     plt.plot(time_points, amplitudes, marker='o', linestyle='-', color='b')
-    plt.title(f'Vågform, frekvens: {str(freq)}')
-    plt.xlabel('Tid')
+    plt.title(f'Vågform, frekvens: {str(freq)} Hz')
+    plt.xlabel('Samplingspunkter')
     plt.ylabel('Amplitud')
     plt.savefig('resultat.png')
 
@@ -17,7 +18,6 @@ def read_data(file_name_1, file_name_2):
     file.close()
     x_files = open(file_name_2, mode = 'r', encoding = 'UTF-8')
     freq = x_files.read()
-    print(str(freq))
     for i in range(len(data_2)):
         data_float.append(float(data_2[i]))
     return data_float

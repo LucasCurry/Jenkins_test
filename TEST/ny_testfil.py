@@ -3,12 +3,13 @@
 # -------------------------------------------------------------
 import pyvisa
 import matplotlib.pyplot as plt
+import numpy as np
 
 # -------------------------------------------------------------
-# Variabler 
+# Variabler
 # -------------------------------------------------------------
 
-data_points_float = []
+amplitude_points_float = []
 
 # -------------------------------------------------------------
 # Block 1: Initialisera
@@ -61,24 +62,38 @@ def mata(oscilloskop):
 
     # Mät amplituden från oscilloskopets mätfunktion
     try:
+        # Ger amplituddata
         raw_data = oscilloskop.query(":WAV:DATA?")
-        frequency = float(oscilloskop.query(":MEASure:FREQuency? CHANnel2"))
-        data_points = [i for i in raw_data.split(',')]
-        data_points.pop(0)
-        for i in range(len(data_points)):
-            data_points[i].strip()
 
-        for i in data_points:
-            data_points_float.append(float(i))
+        # Ger frekvensdata
+        frequency = float(oscilloskop.query(":MEASure:FREQuency? CHANnel2"))
+
+        amplitude_points = [i for i in raw_data.split(',')]
+        amplitude_points.pop(0)
+        for i in range(len(amplitude_points)):
+            amplitude_points[i].strip()
+
+        for i in amplitude_points:
+            amplitude_points_float.append(float(i))
 
         x_files = open('frekvens.csv', mode = 'w', encoding = 'UTF-8')
         x_files.write(str(frequency))
         x_files.close()
 
         file = open('amplituder.csv', mode = 'w', encoding = 'UTF-8')
-        for i in data_points:
+        for i in amplitude_points:
             file.write(str(i) + ',')
         file.close()
+
+        komp_data = list(np.fft.fft(amplitude_points_float))
+        komp_data[0] = 0
+        plt.plot(np.abs(komp_data[0:31]))
+        plt.title('FFT')
+        plt.xlabel('Frekvens (Hz)')
+        plt.ylabel('Amplitud')
+        plt.xticks(np.arange(0, 31, step=5), labels=[str(i*75) for i in range(7)])
+        plt.yticks(np.arange(0, 500, step=500), labels=[str(i) for i in range(1)])
+        plt.savefig('fft.png')
 
     except Exception as e:
         print(f"Misslyckades med att mäta amplitud: {e}")
