@@ -42,7 +42,7 @@ def initialisera():
 
     oscilloskop.write(":RUN")
     oscilloskop.write(":WAV:FORM ASCII")  # För att hämta data i ASCII-format
-    oscilloskop.write(":WAV:SOUR CHAN2")  # Välj kanal 1 (eller den kanal du använder)
+    oscilloskop.write(":WAV:SOUR CHAN2")  # Välj kanal 2 (eller den kanal du använder)
     oscilloskop.write(":WAV:POINTS 1000")  # Antal punkter att hämta
 
     # Ofta behövs mer kod för att ställa in instrumentet inför mätning.
@@ -62,6 +62,7 @@ def mata(oscilloskop):
     # Mät amplituden från oscilloskopets mätfunktion
     try:
         raw_data = oscilloskop.query(":WAV:DATA?")
+        frequency = float(oscilloskop.query(":MEASure:FREQuency? CHANnel2"))
         data_points = [i for i in raw_data.split(',')]
         data_points.pop(0)
         for i in range(len(data_points)):
@@ -70,7 +71,11 @@ def mata(oscilloskop):
         for i in data_points:
             data_points_float.append(float(i))
 
-        file = open('automation_first_matvarden.csv', mode = 'w', encoding = 'UTF-8')
+        x_files = open('frekvens.csv', mode = 'w', encoding = 'UTF-8')
+        x_files.write(str(frequency))
+        x_files.close()
+
+        file = open('amplituder.csv', mode = 'w', encoding = 'UTF-8')
         for i in data_points:
             file.write(str(i) + ',')
         file.close()
